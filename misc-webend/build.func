@@ -1,0 +1,67 @@
+# This function returns a generated MAC address based on the provided hostname
+get_mac() {
+  if [ -n "$1" ]; then
+    local oid="00:16:3e"
+    local hostmac=$(echo $1 | md5sum | sed 's/\(..\)\(..\)\(..\).*/\1:\2:\3/')
+    echo "$oid:$hostmac"
+  else
+    msg_error "Failed to generate MAC Address. No hostname provided"
+  fi
+}
+function variables_webend {
+  var_labctid=$1
+  var_labhostname="$2"
+  var_labhostmac=$(get_mac ${var_labhostname})
+  var_labinstallpath="https://github.com/webend-uk-forks/tteck-proxmox/raw/webend-homelab/install-webend"
+}
+function default_settings_webend {
+  CT_ID=$var_labctid
+  HN="$var_labhostname"
+  MAC=",hwaddr=$var_labhostmac"
+  echo -e "${BL}Using Override Settings${CL}"
+  echo -e "${DGN}Using Container ID: ${BGN}$CT_ID${CL}"
+  echo -e "${DGN}Using Hostname: ${BGN}$HN${CL}"
+  echo -e "${DGN}Using MAC Address: ${BGN}$var_labhostmac${CL}"
+}
+function validate_url(){
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+function execute_node_command_webend {
+  endpoint="$var_labinstallpath/$1-node-install.sh"
+  if validate_url $endpoint; then
+    bash -c "$(wget -qLO - $endpoint)"
+    echo "$2 - NODE - EXECUTED!"
+  else
+    echo "$2 - NODE - NOT FOUND!"
+  fi
+}
+function execute_lxc_command_webend {
+  endpoint="$var_labinstallpath/$1-lxc-install.sh"
+  if validate_url $endpoint; then
+    ENDPOINT=$endpoint;lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - $ENDPOINT)" || exit
+    echo "$2 - LXC - EXECUTED!"
+  else
+    echo "$2 - LXC - NOT FOUND!"
+  fi
+}
+function post_install_webend {
+  execute_node_command_webend $NSAPP "APP"
+  if [[ "$NSAPP" != "$var_labhostname" ]] ; then
+    execute_node_command_webend $var_labhostname "HOST"
+  else
+    echo "APP [$NSAPP] and HOST [$var_labhostname] - MATCH - SKIP NODE COMMAND!"
+  fi
+  execute_lxc_command_webend $NSAPP "APP"
+  if [[ "$NSAPP" != "$var_labhostname" ]] ; then
+    execute_lxc_command_webend $var_labhostname "HOST"
+  else
+    echo "APP [$NSAPP] and HOST [$var_labhostname] - MATCH - SKIP LXC COMMAND!"
+  fi
+  echo "Bounce container"
+  pct stop $CT_ID
+  pct start $CT_ID
+}
