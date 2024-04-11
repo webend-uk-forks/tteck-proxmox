@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PIHOLE_CTID=100
+PIHOLE_CTID=101
 echo "$(date)"
 
 containercount=$( pct list | grep "$PIHOLE_CTID" | wc -l )
