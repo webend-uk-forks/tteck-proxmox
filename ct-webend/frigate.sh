@@ -22,7 +22,7 @@ var_cpu="4"
 var_ram="4096"
 var_os="debian"
 var_version="11"
-variables_webend 133 "frigate"
+variables_webend 141 "frigate"
 variables
 color
 catch_errors
