@@ -100,12 +100,3 @@ cat <<EOF >>$LXC_DNS_CONFIG
 192.168.66.249 flutter-C02G3938MD6M-cable
 # --- END LOKAL ---
 EOF
-
-echo "Flush Network Table"
-pihole arpflush
-
-echo "Restart DNS Resolver"
-pihole restartdns
-
-echo "Flush Logs"
-pihole flush
