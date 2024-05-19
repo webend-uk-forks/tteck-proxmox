@@ -20,8 +20,8 @@ header_info
 echo -e "Loading..."
 APP="Actual Budget"
 var_disk="4"
-var_cpu="1"
-var_ram="1024"
+var_cpu="2"
+var_ram="2048"
 var_os="debian"
 var_version="12"
 variables
@@ -57,7 +57,7 @@ header_info
 if [[ ! -d /opt/actualbudget ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
 msg_info "Updating ${APP}"
 systemctl stop actualbudget.service
-/opt/actualbudget
+cd /opt/actualbudget
 git pull
 yarn install
 systemctl start actualbudget.service
@@ -68,7 +68,10 @@ exit
 start
 build_container
 description
-
+msg_info "Setting Container to Normal Resources"
+pct set $CTID -memory 1024
+pct set $CTID -cores 1
+msg_ok "Set Container to Normal Resources"
 msg_ok "Completed Successfully!\n"
 echo -e "${APP} should be reachable by going to the following URL.
          ${BL}http://${IP}:5006${CL} \n"
