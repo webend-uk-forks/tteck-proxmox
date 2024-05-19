@@ -8,18 +8,18 @@ source <(curl -s https://raw.githubusercontent.com/tteck/Proxmox/main/misc/build
 function header_info {
 clear
 cat <<"EOF"
-    ____       __    _           
-   / __ \___  / /_  (_)___  ____ 
-  / / / / _ \/ __ \/ / __ `/ __ \
- / /_/ /  __/ /_/ / / /_/ / / / /
-/_____/\___/_.___/_/\__,_/_/ /_/ 
-                                 
+    __  ___                        ____  ____ 
+   /  |/  /___  ____  ____ _____  / __ \/ __ )
+  / /|_/ / __ \/ __ \/ __ `/ __ \/ / / / __  |
+ / /  / / /_/ / / / / /_/ / /_/ / /_/ / /_/ / 
+/_/  /_/\____/_/ /_/\__, /\____/_____/_____/  
+                   /____/                     
 EOF
 }
 header_info
 echo -e "Loading..."
-APP="Debian"
-var_disk="2"
+APP="MongoDB"
+var_disk="4"
 var_cpu="1"
 var_ram="512"
 var_os="debian"
@@ -54,11 +54,11 @@ function default_settings() {
 
 function update_script() {
 header_info
-if [[ ! -d /var ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
-msg_info "Updating $APP LXC"
+if [[ ! -f /etc/apt/sources.list.d/mongodb-org-7.0.list ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
+msg_info "Updating ${APP} LXC"
 apt-get update &>/dev/null
 apt-get -y upgrade &>/dev/null
-msg_ok "Updated $APP LXC"
+msg_ok "Updated Successfully"
 exit
 }
 
