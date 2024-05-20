@@ -30,13 +30,13 @@ function validate_url(){
     return 1
   fi
 }
-function execute_node_command_webend {
-  endpoint="$var_labinstallpath/$1-node-install.sh"
+function execute_pve_command_webend {
+  endpoint="$var_labinstallpath/$1-pve-install.sh"
   if validate_url $endpoint; then
     bash -c "$(wget -qLO - $endpoint)"
-    echo "$2 - NODE - EXECUTED!"
+    echo "$2 - PVE - EXECUTED!"
   else
-    echo "$2 - NODE - NOT FOUND!"
+    echo "$2 - PVE - NOT FOUND!"
   fi
 }
 function execute_lxc_command_webend {
@@ -49,9 +49,9 @@ function execute_lxc_command_webend {
   fi
 }
 function post_install_webend {
-  execute_node_command_webend $NSAPP "APP"
+  execute_pve_command_webend $NSAPP "APP"
   if [[ "$NSAPP" != "$var_labhostname" ]] ; then
-    execute_node_command_webend $var_labhostname "HOST"
+    execute_pve_command_webend $var_labhostname "HOST"
   else
     echo "APP [$NSAPP] and HOST [$var_labhostname] - MATCH - SKIP NODE COMMAND!"
   fi
