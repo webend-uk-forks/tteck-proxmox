@@ -8,18 +8,18 @@
 function header_info {
 clear
 cat <<"EOF"
-  ______      _ __                __
- /_  __/___ _(_) /_____________ _/ /__
-  / / / __ `/ / / ___/ ___/ __ `/ / _ \
- / / / /_/ / / (__  ) /__/ /_/ / /  __/
-/_/  \__,_/_/_/____/\___/\__,_/_/\___/
+    _   __     __  ____  _          __
+   / | / /__  / /_/ __ )(_)________/ /
+  /  |/ / _ \/ __/ __  / / ___/ __  /
+ / /|  /  __/ /_/ /_/ / / /  / /_/ /
+/_/ |_/\___/\__/_____/_/_/   \__,_/
 
 EOF
 }
 header_info
 set -e
 while true; do
-  read -p "This will add Tailscale to an existing LXC Container ONLY. Proceed(y/n)?" yn
+  read -p "This will add NetBird to an existing LXC Container ONLY. Proceed(y/n)?" yn
   case $yn in
   [Yy]*) break ;;
   [Nn]*) exit ;;
@@ -47,7 +47,7 @@ done < <(pct list | awk 'NR>1')
 
 while [ -z "${CTID:+x}" ]; do
   CTID=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Containers on $NODE" --radiolist \
-    "\nSelect a container to add Tailscale to:\n" \
+    "\nSelect a container to add NetBird to:\n" \
     16 $(($MSG_MAX_LENGTH + 23)) 6 \
     "${CTID_MENU[@]}" 3>&1 1>&2 2>&3) || exit
 done
@@ -58,15 +58,14 @@ lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 EOF
 header_info
-msg "Installing Tailscale..."
+msg "Installing NetBird..."
 pct exec "$CTID" -- bash -c '
-ID=$(grep "^ID=" /etc/os-release | cut -d"=" -f2)
-VER=$(grep "^VERSION_CODENAME=" /etc/os-release | cut -d"=" -f2)
-wget -qO- https://pkgs.tailscale.com/stable/$ID/$VER.noarmor.gpg >/usr/share/keyrings/tailscale-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/$ID $VER main" >/etc/apt/sources.list.d/tailscale.list
+apt install -y ca-certificates gpg &>/dev/null
+wget -qO- https://pkgs.netbird.io/debian/public.key | gpg --dearmor >/usr/share/keyrings/netbird-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/netbird-archive-keyring.gpg] https://pkgs.netbird.io/debian stable main" >/etc/apt/sources.list.d/netbird.list
 apt-get update &>/dev/null
-apt-get install -y tailscale &>/dev/null
+apt-get install -y netbird-ui &>/dev/null
 ' || exit
-msg "\e[1;32m ✔ Installed Tailscale\e[0m"
-
-msg "\e[1;31m Reboot ${CTID} LXC to apply the changes, then run tailscale up in the LXC console\e[0m"
+msg "\e[1;32m ✔ Installed NetBird.\e[0m"
+sleep 2
+msg "\e[1;31m Reboot ${CTID} LXC to apply the changes, then run netbird up in the LXC console\e[0m"
