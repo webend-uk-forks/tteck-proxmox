@@ -8,22 +8,22 @@ source <(curl -s https://raw.githubusercontent.com/tteck/Proxmox/main/misc/build
 function header_info {
 clear
 cat <<"EOF"
- _____
-/__  /  ____  _________ __  ____  __
-  / /  / __ \/ ___/ __ `/ |/_/ / / /
- / /__/ /_/ / /  / /_/ />  </ /_/ /
-/____/\____/_/   \__,_/_/|_|\__, /
-                           /____/
+    ____       __  _     
+   / __ \___  / /_(_)___ 
+  / /_/ / _ \/ __/ / __ \
+ / ____/  __/ /_/ / /_/ /
+/_/    \___/\__/_/\____/ 
+
 EOF
 }
 header_info
 echo -e "Loading..."
-APP="Zoraxy"
-var_disk="6"
-var_cpu="4"
-var_ram="2048"
-var_os="debian"
-var_version="12"
+APP="Petio"
+var_disk="4"
+var_cpu="2"
+var_ram="1024"
+var_os="ubuntu"
+var_version="20.04"
 variables
 color
 catch_errors
@@ -54,19 +54,13 @@ function default_settings() {
 
 function update_script() {
 header_info
-if [[ ! -d /opt/zoraxy/src ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
+if [[ ! -d /opt/Petio ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
 msg_info "Updating $APP"
-systemctl stop zoraxy
-cd /opt/zoraxy/src
-systemctl stop zoraxy
-if git pull | grep -q 'Already up to date.'; then
-  msg_ok "Already up to date. No update required."
-else
-  go mod tidy
-  go build
-  msg_ok "Updated $APP"
-fi
-systemctl start zoraxy
+systemctl stop petio.service
+wget https://petio.tv/releases/latest -O petio-latest.zip
+unzip petio-latest.zip -d /opt/Petio
+systemctl start petio.service
+msg_ok "Updated $APP"
 exit
 }
 
@@ -74,9 +68,6 @@ start
 build_container
 description
 
-msg_info "Setting Container to Normal Resources"
-pct set $CTID -cores 2
-msg_ok "Set Container to Normal Resources"
 msg_ok "Completed Successfully!\n"
 echo -e "${APP} should be reachable by going to the following URL.
-         ${BL}http://${IP}:8000${CL} \n"
+         ${BL}http://${IP}:7777${CL} \n"

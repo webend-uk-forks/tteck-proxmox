@@ -8,17 +8,17 @@ source <(curl -s https://raw.githubusercontent.com/tteck/Proxmox/main/misc/build
 function header_info {
 clear
 cat <<"EOF"
-  ______                _____ __  
- /_  __/________ ____  / __(_) /__
-  / / / ___/ __ `/ _ \/ /_/ / //_/
- / / / /  / /_/ /  __/ __/ / ,<   
-/_/ /_/   \__,_/\___/_/ /_/_/|_|  
+    _   __      __  _ _____
+   / | / /___  / /_(_) __(_)___ ___________
+  /  |/ / __ \/ __/ / /_/ / __ `/ ___/ ___/
+ / /|  / /_/ / /_/ / __/ / /_/ / /  / /
+/_/ |_/\____/\__/_/_/ /_/\__,_/_/  /_/
 
 EOF
 }
 header_info
 echo -e "Loading..."
-APP="Traefik"
+APP="Notifiarr"
 var_disk="2"
 var_cpu="1"
 var_ram="512"
@@ -54,18 +54,11 @@ function default_settings() {
 
 function update_script() {
 header_info
-if [[ ! -f /etc/systemd/system/traefik.service ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
-RELEASE=$(curl -s https://api.github.com/repos/traefik/traefik/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
-msg_info "Updating $APP LXC"
-if [[ "${RELEASE}" != "$(cat /opt/${APP}_version.txt)" ]] || [[ ! -f /opt/${APP}_version.txt ]]; then
-  wget -q https://github.com/traefik/traefik/releases/download/v${RELEASE}/traefik_v${RELEASE}_linux_amd64.tar.gz
-  tar -C /tmp -xzf traefik*.tar.gz
-  mv /tmp/traefik /usr/bin/
-  rm -rf traefik*.tar.gz
-  msg_ok "Updated $APP LXC"
-else
-  msg_ok "No update required. ${APP} is already at ${RELEASE}"
-fi
+if [[ ! -f /etc/apt/sources.list.d/golift.list ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
+msg_info "Updating $APP"
+apt-get update &>/dev/null
+apt-get -y upgrade &>/dev/null
+msg_ok "Updated $APP"
 exit
 }
 
@@ -75,4 +68,4 @@ description
 
 msg_ok "Completed Successfully!\n"
 echo -e "${APP} should be reachable by going to the following URL.
-         ${BL}http://${IP}:8080${CL} \n"
+         ${BL}http://${IP}:5454${CL} \n"

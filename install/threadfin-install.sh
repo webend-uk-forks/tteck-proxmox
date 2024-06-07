@@ -14,47 +14,42 @@ network_check
 update_os
 
 msg_info "Installing Dependencies"
-$STD apt-get install -y curl
 $STD apt-get install -y sudo
 $STD apt-get install -y mc
-$STD apt-get install -y sqlite3
-$STD apt-get install -y libchromaprint-tools
-$STD apt-get install -y mediainfo
+$STD apt-get install -y curl
+$STD apt-get install -y ffmpeg
+$STD apt-get install -y vlc
 msg_ok "Installed Dependencies"
 
-msg_info "Installing Lidarr"
-mkdir -p /var/lib/lidarr/
-chmod 775 /var/lib/lidarr/
-$STD wget --content-disposition 'https://lidarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64'
-$STD tar -xvzf Lidarr.master.*.tar.gz
-mv Lidarr /opt
-chmod 775 /opt/Lidarr
-msg_ok "Installed Lidarr"
+msg_info "Installing Threadfin"
+mkdir -p /opt/threadfin
+wget -q -O /opt/threadfin/threadfin 'https://github.com/Threadfin/Threadfin/releases/latest/download/Threadfin_linux_amd64'
+chmod +x /opt/threadfin/threadfin
+
+msg_ok "Installed Threadfin"
 
 msg_info "Creating Service"
-cat <<EOF >/etc/systemd/system/lidarr.service
+cat <<EOF >/etc/systemd/system/threadfin.service
 [Unit]
-Description=Lidarr Daemon
+Description=Threadfin: M3U Proxy for Plex DVR and Emby/Jellyfin Live TV
 After=syslog.target network.target
 [Service]
-UMask=0002
 Type=simple
-ExecStart=/opt/Lidarr/Lidarr -nobrowser -data=/var/lib/lidarr/
+WorkingDirectory=/opt/threadfin
+ExecStart=/opt/threadfin/threadfin
 TimeoutStopSec=20
 KillMode=process
 Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl -q daemon-reload
-systemctl enable --now -q lidarr
+systemctl enable -q --now threadfin.service
 msg_ok "Created Service"
 
 motd_ssh
 customize
 
 msg_info "Cleaning up"
-rm -rf Lidarr.master.*.tar.gz
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
 msg_ok "Cleaned"

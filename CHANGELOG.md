@@ -8,7 +8,57 @@
 <h3 align="center">All notable changes to this project will be documented in this file.</h3>
 
 - All LXC instances created using this repository come pre-installed with Midnight Commander, which is a command-line tool (`mc`) that offers a user-friendly file and directory management interface for the terminal environment.
-- 🚨 **The scripts in the repository will no longer provide support for Proxmox VE 7 starting from July 2024 (scripts will not execute on PVE7). Subsequent <a href='https://forum.proxmox.com/threads/proxmox-ve-support-lifecycle.35755/' target='_blank' rel='noopener noreferrer'>Proxmox VE - Support Lifecycle</a>**
+
+## 2024-06-06
+
+### Changed
+
+- **Petio LXC**
+  - NEW Script
+- **Website**
+  - Important notices will now be displayed on the landing page.
+
+## 2024-06-04
+
+### Changed
+
+- **FlareSolverr LXC**
+  - NEW Script
+
+## 2024-05-31
+
+### Changed
+
+- **Advanced Settings**
+  - Passwords are now masked
+
+## 2024-05-30
+
+### Changed
+
+- **Forgejo LXC**
+  - NEW Script
+
+## 2024-05-28
+
+### Changed
+
+- **Notifiarr LXC**
+  - NEW Script
+
+## 2024-05-25
+
+### Changed
+
+- **Threadfin LXC**
+  - NEW Script
+
+## 2024-05-23
+
+### Changed
+
+- **BunkerWeb LXC**
+  - NEW Script
 
 ## 2024-05-20
 

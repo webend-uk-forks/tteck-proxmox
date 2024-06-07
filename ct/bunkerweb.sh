@@ -8,20 +8,20 @@ source <(curl -s https://raw.githubusercontent.com/tteck/Proxmox/main/misc/build
 function header_info {
 clear
 cat <<"EOF"
- _____
-/__  /  ____  _________ __  ____  __
-  / /  / __ \/ ___/ __ `/ |/_/ / / /
- / /__/ /_/ / /  / /_/ />  </ /_/ /
-/____/\____/_/   \__,_/_/|_|\__, /
-                           /____/
+    ____              __            _       __     __
+   / __ )__  ______  / /_____  ____| |     / /__  / /_
+  / __  / / / / __ \/ //_/ _ \/ ___/ | /| / / _ \/ __ \
+ / /_/ / /_/ / / / / ,< /  __/ /   | |/ |/ /  __/ /_/ /
+/_____/\__,_/_/ /_/_/|_|\___/_/    |__/|__/\___/_.___/
+
 EOF
 }
 header_info
 echo -e "Loading..."
-APP="Zoraxy"
-var_disk="6"
-var_cpu="4"
-var_ram="2048"
+APP="BunkerWeb"
+var_disk="4"
+var_cpu="2"
+var_ram="1024"
 var_os="debian"
 var_version="12"
 variables
@@ -54,19 +54,11 @@ function default_settings() {
 
 function update_script() {
 header_info
-if [[ ! -d /opt/zoraxy/src ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
+if [[ ! -d /etc/bunkerweb ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
 msg_info "Updating $APP"
-systemctl stop zoraxy
-cd /opt/zoraxy/src
-systemctl stop zoraxy
-if git pull | grep -q 'Already up to date.'; then
-  msg_ok "Already up to date. No update required."
-else
-  go mod tidy
-  go build
-  msg_ok "Updated $APP"
-fi
-systemctl start zoraxy
+apt-get update &>/dev/null
+apt-get -y upgrade &>/dev/null
+msg_ok "Updated $APP"
 exit
 }
 
@@ -74,9 +66,6 @@ start
 build_container
 description
 
-msg_info "Setting Container to Normal Resources"
-pct set $CTID -cores 2
-msg_ok "Set Container to Normal Resources"
 msg_ok "Completed Successfully!\n"
-echo -e "${APP} should be reachable by going to the following URL.
-         ${BL}http://${IP}:8000${CL} \n"
+echo -e "${APP} setup should be reachable by going to the following URL.
+         ${BL}http://${IP}/setup${CL} \n"

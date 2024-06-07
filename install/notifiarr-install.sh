@@ -17,24 +17,22 @@ msg_info "Installing Dependencies"
 $STD apt-get install -y curl
 $STD apt-get install -y sudo
 $STD apt-get install -y mc
+$STD apt-get install -y gpg
 msg_ok "Installed Dependencies"
 
-msg_info "Installing Runtipi (Patience)"
-DOCKER_CONFIG_PATH='/etc/docker/daemon.json'
-mkdir -p "$(dirname "$DOCKER_CONFIG_PATH")"
-echo -e '{\n  "log-driver": "journald"\n}' > "$DOCKER_CONFIG_PATH"
-cd /opt
-wget -q https://raw.githubusercontent.com/runtipi/runtipi/master/scripts/install.sh
-chmod +x install.sh
-$STD ./install.sh
-chmod 666 /opt/runtipi/state/settings.json
-msg_ok "Installed Runtipi"
+msg_info "Installing Notifiarr"
+$STD groupadd notifiarr
+$STD useradd -g notifiarr notifiarr
+wget -qO- https://packagecloud.io/golift/pkgs/gpgkey | gpg --dearmor >/usr/share/keyrings/golift-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/golift-archive-keyring.gpg] https://packagecloud.io/golift/pkgs/ubuntu focal main" >/etc/apt/sources.list.d/golift.list
+$STD apt-get update
+$STD apt-get install -y notifiarr
+msg_ok "Installed Notifiarr"
 
 motd_ssh
 customize
 
 msg_info "Cleaning up"
-rm /opt/install.sh
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
 msg_ok "Cleaned"
